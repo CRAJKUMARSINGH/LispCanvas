@@ -1,0 +1,151 @@
+Below is Part-C – PMGSY / Rural-Road package – that drops straight into your existing Streamlit app.
+It contains three new detailers:
+
+    Road Plan (C:Rplan) – polyline-based centre-line layout
+    Road L-Section (C:ROADL) – longitudinal profile with datum, NSL, formation, gradient, chainage
+    Road Cross-Section (C:ROADX) – cambered cross-section with datum, NSL, formation, side slopes
+
+Toggle “Enable PMGSY Roads” in the sidebar to expose them.
+1. New sidebar toggle & inputs
+Python
+Copy
+
+# --------------------------------------------------
+#  NEW  –  PMGSY / RURAL ROADS  (Part-C)
+# --------------------------------------------------
+with st.sidebar:
+    if st.checkbox("Enable PMGSY Roads"):
+        st.subheader("PMGSY Roads")
+        detailer = st.selectbox("Choose PMGSY detailer",
+                                ["Road Plan", "Road L-Section", "Cross-Section"])
+
+        # --- parameters common to all three ---
+        road_mark = st.text_input("Road mark", "PMGSY-01")
+        fw = st.number_input("Formation width (m)", 4.0, 10.0, 7.5)
+        cw = st.number_input("Carriageway width (m)", 3.0, 7.5, 3.75)
+        max_level = st.number_input("Max level (m)", 90.0, 150.0, 100.0)
+        min_level = st.number_input("Min level (m)", 85.0, 95.0, 88.0)
+        datum = int(min_level / 5) * 5   # auto-datum like LISP
+        camber_c = st.number_input("Camber carriageway (%)", 1.0, 5.0, 3.0)
+        camber_s = st.number_input("Camber shoulder (%)", 2.0, 6.0, 4.0)
+        side_slope = st.number_input("Side slope (n:1)", 1.0, 5.0, 1.5)
+
+        # --- detailer-specific ---
+        if detailer == "Road Plan":
+            n_lines = st.number_input("No. of plan lines", 1, 20, 5)
+            lengths = [st.number_input(f"Length {i+1} (m)", 10.0, 500.0, 50.0, key=f"len{i}")
+                       for i in range(n_lines)]
+            angles = [st.number_input(f"Angle {i+1} (deg)", -180, 180, 0, key=f"ang{i}")
+                      for i in range(n_lines)]
+
+        if detailer == "Road L-Section":
+            length = st.number_input("Road length (m)", 50.0, 1000.0, 500.0)
+            interval = st.number_input("Survey interval (m)", 5.0, 50.0, 20.0)
+            nsl_first = st.number_input("NSL first point (m)", 85.0, 95.0, 89.0)
+            # allow user to enter NSL for every station
+            nof = int(length / interval)
+            ns_list = [st.number_input(f"NSL @ {i*interval} m",
+                                       min_level-2, max_level+2,
+                                       nsl_first - i*0.5, key=f"nsl{i}")
+                       for i in range(nof+1)]
+
+        if detailer == "Cross-Section":
+            # pre-filled 3-pt example, user can override
+            pts_l = [(st.number_input(f"Left pt {i+1} offset (m)", -fw-5, 0.0, -i-1.0, key=f"lo{i}"),
+                      st.number_input(f"Left pt {i+1} NSL (m)", min_level-2, max_level+2,
+                                      88.0-i*0.5, key=f"ln{i}"))
+                     for i in range(3)]
+            pts_r = [(st.number_input(f"Right pt {i+1} offset (m)", 0.0, fw+5, i+1.0, key=f"ro{i}"),
+                      st.number_input(f"Right pt {i+1} NSL (m)", min_level-2, max_level+2,
+                                      88.0-i*0.5, key=f"rn{i}"))
+                     for i in range(3)]
+
+        fl_point = st.number_input("Formation level (m)", 85.0, 95.0, 90.0)
+
+2. Drawing generator (ezdxf)
+Python
+Copy
+
+        @st.cache_data
+        def make_pmgsy_dxf(detailer, **kw):
+            doc = ezdxf.new("R2010")
+            msp = doc.modelspace()
+            if detailer == "Road Plan":
+                pt = (0, 0)
+                for L, A in zip(kw["lengths"], kw["angles"]):
+                    rad = math.radians(A)
+                    next_pt = (pt[0] + L * math.cos(rad),
+                               pt[1] + L * math.sin(rad))
+                    msp.add_line(pt, next_pt)
+                    pt = next_pt
+
+            elif detailer == "Road L-Section":
+                length, interval, ns_list = kw["length"], kw["interval"], kw["ns_list"]
+                datum = kw["datum"]
+                # vertical datum line
+                msp.add_line((0, -10), (0, kw["max_level"] - datum))
+                # datum text
+                msp.add_text(f"Datum {datum} m", dxfattribs={'height': 1}) \
+                   .set_pos((-5, 0))
+                # NSL polyline
+                pts = [(i * interval, ns - datum)
+                       for i, ns in enumerate(ns_list)]
+                msp.add_lwpolyline(pts)
+                # formation line
+                yf = kw["fl"] - datum
+                msp.add_line((0, yf), (length, yf))
+
+            elif detailer == "Cross-Section":
+                fw, cw, fl, datum = kw["fw"], kw["cw"], kw["fl"], kw["datum"]
+                camber_c, camber_s, side_slope = kw["camber_c"], kw["camber_s"], kw["side_slope"]
+                sw = (fw - cw) / 2
+                yf = fl - datum
+                # centre
+                ptfc = (0, yf)
+                ptfl1 = (-cw/2, yf - (camber_c * cw / 100))
+                ptfl2 = (-fw/2, ptfl1[1] - (camber_s * sw / 100))
+                r = side_slope * (ptfl2[1] - 0)
+                ptfl3 = (ptfl2[0] - r, 0)
+                ptfr1 = (cw/2, ptfl1[1])
+                ptfr2 = (fw/2, ptfl2[1])
+                ptfr3 = (ptfr2[0] + r, 0)
+                msp.add_lwpolyline([ptfl3, ptfl2, ptfl1, ptfc, ptfr1, ptfr2, ptfr3])
+                # survey points
+                for x, y in kw["pts_l"] + kw["pts_r"]:
+                    msp.add_line((x, y - datum), (x, y - datum + 2))
+                    msp.add_text(f"{y:.2f}", dxfattribs={'height': 0.5}).set_pos((x, y - datum + 2.5))
+            return doc
+
+        # ---------- CALL ----------
+        kw = {"detailer": detailer,
+              "fw": fw, "cw": cw, "max_level": max_level, "min_level": min_level,
+              "datum": datum, "camber_c": camber_c, "camber_s": camber_s,
+              "side_slope": side_slope, "fl": fl_point}
+
+        if detailer == "Road Plan":
+            kw.update(lengths=lengths, angles=angles)
+        elif detailer == "Road L-Section":
+            kw.update(length=length, interval=interval, ns_list=ns_list)
+        elif detailer == "Cross-Section":
+            kw.update(pts_l=pts_l, pts_r=pts_r)
+
+        doc = make_pmgsy_dxf(**kw)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as fp:
+            doc.saveas(fp.name)
+            st.download_button("⬇️ PMGSY DXF", data=open(fp.name, "rb").read(),
+                               file_name=f"{road_mark}_{detailer.replace(' ', '_')}.dxf")
+
+        st.image("https://via.placeholder.com/800x400?text=" + detailer.replace(" ", "+"))
+
+3. Folder / usage
+
+    No extra files – everything is inside the single app.py.
+    Run once:
+
+bash
+Copy
+
+streamlit run app.py
+
+Toggle “Enable PMGSY Roads” → choose Plan / L-Section / Cross-Section → download DXF immediately.
+Nothing left over.

@@ -1,0 +1,5 @@
+
+(COMMAND "DIMSCALE" 25)
+(COMMAND "ZOOM" "C" PTC1 250)
+; to be added before array command.
+(COMMAND "ARRAY" "SI" PTC1 "RECT" "1" NBB SPACINGB)
