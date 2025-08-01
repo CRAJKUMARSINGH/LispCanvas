@@ -1,0 +1,4 @@
+*.dxf
+*.txt
+__pycache__/
+.vscode/

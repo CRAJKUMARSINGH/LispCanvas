@@ -163,25 +163,32 @@ def bar_xy(n, spacing, cover):
 def make_dxf():
     doc = ezdxf.new("R2010")
     msp = doc.modelspace()
-    # footing plan rectangle
-    half = footing_side/2
-    msp.add_lwpolyline([(-half, -half), (half, -half), (half, half), (-half, half)], close=True)
-    # column rectangle
-    msp.add_lwpolyline([(-b/2, -d/2), (b/2, -d/2), (b/2, d/2), (-b/2, d/2)], close=True)
-    # footing mesh X
-    y = bar_xy(ceil((footing_side-2*cover)/mesh_spacing_x)+1, mesh_spacing_x, -half+cover)
-    for yc in y:
-        msp.add_line((-half, yc), (half, yc))
-    # footing mesh Y
-    x = bar_xy(ceil((footing_side-2*cover)/mesh_spacing_y)+1, mesh_spacing_y, -half+cover)
-    for xc in x:
-        msp.add_line((xc, -half), (xc, half))
-    # column bars (simplified)
-    dy = bar_xy(n_flange, (d-2*cover)/(n_flange-1), -d/2+cover)
-    for yc in dy:
-        msp.add_line((0, yc), (0, yc+depth_centre))
-    # text
-    msp.add_text(f"Column {col_num}", dxfattribs={'height': 50, 'layer': "TEXT"}).set_pos((-half-200, -half-200))
+    try:
+        # footing plan rectangle
+        half = footing_side/2
+        msp.add_lwpolyline([(-half, -half), (half, -half), (half, half), (-half, half)], close=True)
+        # column rectangle
+        msp.add_lwpolyline([(-b/2, -d/2), (b/2, -d/2), (b/2, d/2), (-b/2, d/2)], close=True)
+        # footing mesh X
+        y = bar_xy(ceil((footing_side-2*cover)/mesh_spacing_x)+1, mesh_spacing_x, -half+cover)
+        for yc in y:
+            msp.add_line((-half, yc), (half, yc))
+        # footing mesh Y
+        x = bar_xy(ceil((footing_side-2*cover)/mesh_spacing_y)+1, mesh_spacing_y, -half+cover)
+        for xc in x:
+            msp.add_line((xc, -half), (xc, half))
+        # column bars (simplified)
+        dy = bar_xy(n_flange, (d-2*cover)/(n_flange-1), -d/2+cover)
+        for yc in dy:
+            msp.add_line((0, yc), (0, yc+depth_centre))
+        # text - position relative to drawing extents
+        text_x = -half - 200
+        text_y = -half - 200
+        msp.add_text(f"Column {col_num}", dxfattribs={'height': 50, 'layer': "TEXT"}).set_pos((text_x, text_y))
+    except Exception as e:
+        st.error(f"Error generating DXF: {str(e)}")
+        # Add a minimal valid DXF even if there's an error
+        msp.add_text("Error in drawing", dxfattribs={'height': 50}).set_pos((0, 0))
     return doc
 
 doc = make_dxf()
