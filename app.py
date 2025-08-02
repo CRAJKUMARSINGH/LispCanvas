@@ -492,3 +492,183 @@ st.metric("Long. steel", f"{steel_long:.1f} kg")
 
 st.subheader("Circular Column")
 st.metric("Steel (3m stub)", f"{steel_circ:.1f} kg")
+
+
+
+
+
+###############################################################
+# RECTANGLE COLUMN WOTH FOOTING
+# app.py
+import streamlit as st
+import ezdxf
+from math import ceil, sin, cos, radians
+import tempfile, os, datetime, json
+
+st.set_page_config(page_title="RC Column-Footing Detailer", layout="wide")
+
+st.title("📐 RC Column-Footing Detailer (Desktop)")
+st.caption("Port of the original AutoLISP `FOOTSQR` to Streamlit")
+
+# ---------- Sidebar = design inputs ----------
+with st.sidebar:
+    st.header("Rectangular Column")
+    b        = st.number_input("Column width B (mm)", 200, 800, 300)
+    d        = st.number_input("Column depth D (mm)", 200, 800, 450)
+    dia_long = st.number_input("Long. bar dia (mm)", 10, 40, 20)
+    n_total  = st.number_input("Total #long bars", 4, 20, 8)
+    n_flange = st.number_input("#bars per flange", 2, 10, 3)
+    dia_tie  = st.number_input("Tie dia (mm)", 6, 16, 8)
+    spacing  = st.number_input("Tie spacing (mm)", 50, 300, 150)
+    col_num  = st.text_input("Column mark", "C-42")
+
+    st.header("Footing")
+    footing_side      = st.number_input("Footing side (mm)", 1000, 4000, 2100)
+    depth_edge        = st.number_input("Depth at edge (mm)", 150, 600, 300)
+    depth_centre      = st.number_input("Depth at centre (mm)", 200, 1000, 600)
+    mesh_dia_x        = st.number_input("Mesh dia X (mm)", 8, 25, 16)
+    mesh_spacing_x    = st.number_input("Mesh spacing X (mm)", 50, 300, 150)
+    mesh_dia_y        = st.number_input("Mesh dia Y (mm)", 8, 25, 16)
+    mesh_spacing_y    = st.number_input("Mesh spacing Y (mm)", 50, 300, 150)
+    pcc_proj          = st.number_input("PCC projection (mm)", 0, 200, 75)
+    pcc_thick         = st.number_input("PCC thickness (mm)", 50, 150, 100)
+    pedestal_proj     = st.number_input("Pedestal projection (mm)", 0, 300, 150)
+    scale             = st.number_input("Drawing scale", 1, 100, 25)
+
+    # ---------- Circular column ----------
+    st.header("Circular Column")
+    d_circ = st.number_input("Diameter (mm)", 200, 800, 300, key="d_circ")
+    dia_long_circ = st.number_input("Long. bar dia (mm)", 10, 40, 20, key="dialc")
+    n_total_circ = st.number_input("Total #bars", 4, 20, 8, key="ntc")
+    dia_tie_circ = st.number_input("Tie dia (mm)", 6, 16, 8, key="dtc")
+    spacing_circ = st.number_input("Tie spacing (mm)", 50, 300, 150, key="spc")
+    col_num_circ = st.text_input("Column mark", "C-43", key="cnc")
+
+    # --------------------------------------------------
+    #  NEW  –  STAIRCASE DETAILER
+    # --------------------------------------------------
+    st.sidebar.header("Staircase")
+    if st.sidebar.checkbox("Add Staircase"):
+        cl = st.number_input("Clear span (mm)", 2000, 6000, 3000, key="cl")
+        wst = st.number_input("Stair width (mm)", 800, 2000, 1000, key="wst")
+        thwall = st.number_input("Support wall width (mm)", 200, 400, 230, key="thwall")
+        ll = st.number_input("Live load (kN/m²)", 2.0, 5.0, 3.0, key="ll")
+        ff = st.number_input("Floor finish (kN/m²)", 0.5, 2.0, 1.0, key="ff")
+        nrise = st.number_input("No. of risers", 8, 20, 12, key="nrise")
+        rise = st.number_input("Riser (mm)", 140, 190, 150, key="rise")
+        tread = st.number_input("Tread (mm)", 250, 320, 280, key="tread")
+        fck = st.number_input("fck (N/mm²)", 15, 50, 25, key="fck")
+        fy = st.number_input("fy (N/mm²)", 250, 500, 415, key="fy")
+
+        # ----------- 2-D DRAWING & DOWNLOAD ----------
+        import math
+        ntread = nrise - 1
+        incl = math.sqrt(rise**2 + tread**2)
+        thkwsb = max(20, round((cl / 20) / 10) * 10)
+        doc_stair = ezdxf.new("R2010")
+        msp = doc_stair.modelspace()
+        plan_pts = [(0, 0), (wgoing + tread, 0), (wgoing + tread, wst), (0, wst)]
+        msp.add_lwpolyline(plan_pts, close=True)
+        elev_pts = [(0, 0), (wgoing, 0), (wgoing, nrise*rise), (0, nrise*rise)]
+        msp.add_lwpolyline(elev_pts, close=True)
+        for i in range(1, nrise + 1):
+            msp.add_line((0, i*rise), (wgoing, i*rise))
+        msp.add_text("Staircase", dxfattribs={'height': 100}).set_pos((0, -200))
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as fp:
+            doc_stair.saveas(fp.name)
+            st.download_button("⬇️ Staircase DXF", open(fp.name,'rb').read(),
+                               "staircase.dxf")
+
+# ---------- DXF generation ----------
+@st.cache_data
+def make_dxf():
+    doc = ezdxf.new("R2010")
+    msp = doc.modelspace()
+    half = footing_side/2
+    msp.add_lwpolyline([(-half, -half), (half, -half), (half, half), (-half, half)], close=True)
+    msp.add_lwpolyline([(-b/2, -d/2), (b/2, -d/2), (b/2, d/2), (-b/2, d/2)], close=True)
+    # mesh & bars omitted for brevity
+    msp.add_text(f"Column {col_num}", dxfattribs={'height': 50}).set_pos((-half-200, -half-200))
+    return doc
+
+doc = make_dxf()
+
+# ---------- Circular-column DXF ----------
+@st.cache_data
+def make_dxf_circ():
+    doc = ezdxf.new("R2010")
+    msp = doc.modelspace()
+    msp.add_circle((0, 0), d_circ/2)
+    # rebar circles omitted for brevity
+    msp.add_text(f"Column {col_num_circ}", dxfattribs={'height': 50}).set_pos((0, -d_circ/2-100))
+    return doc
+
+doc_circ = make_dxf_circ()
+
+# ---------- Download buttons + take-off ----------
+col1, col2 = st.columns(2)
+with col1:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as fp:
+        doc.saveas(fp.name)
+        st.download_button("⬇️ Rectangular DXF", open(fp.name,'rb').read(), col_num+".dxf")
+with col2:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as fp:
+        doc_circ.saveas(fp.name)
+        st.download_button("⬇️ Circular DXF", open(fp.name,'rb').read(), col_num_circ+".dxf")
+# -------------------------------------------------
+# 11.  🌉  BRIDGE GAD  (plug-in from Tested_Bridge_GAD)
+# -------------------------------------------------
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "Tested_Bridge_GAD"))
+from Tested_Bridge_GAD.bridge_gad_app import (
+    read_variables as bridge_read,
+    doc as bridge_doc,
+    generate_pier_caps,
+    generate_pier_footings,
+    generate_tender_report
+)
+
+def page_bridge_gad():
+    st.header("🌉 Bridge GAD Generator")
+    st.markdown("Upload an Excel file (186 rows) and download DXF + PDF instantly.")
+
+    uploaded = st.file_uploader("Choose Excel file", type=["xlsx"], key="bridge")
+    if uploaded is not None:
+        df = bridge_read(uploaded)
+        if df is None:
+            st.error("Could not read Excel.")
+            return
+
+        st.dataframe(df, use_container_width=True)
+
+        # pull variables
+        vars = dict(zip(df['Variable'], df['Value']))
+        abtl   = float(vars.get('ABTL', 0))
+        lspan  = float(vars.get('SPAN1', 10))
+        nspan  = int(vars.get('NSPAN', 2))
+        capw   = float(vars.get('CAPW', 1.2))
+        capt   = float(vars.get('CAPT', 110))
+        capb   = float(vars.get('CAPB', 109.4))
+        futw   = float(vars.get('FUTW', 4.5))
+        futd   = float(vars.get('FUTD', 1.5))
+        futrl  = float(vars.get('FUTRL', 100))
+        hhs    = 1
+
+        if st.button("Draw & Download"):
+            with st.spinner("Regenerating drawing …"):
+                bridge_doc.entities.clear()
+                generate_pier_caps(abtl, lspan, capw, capt, capb, nspan, hhs)
+                generate_pier_footings(futw, futd, futrl, nspan)
+
+                # DXF
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".dxf") as tmp:
+                    bridge_doc.saveas(tmp.name)
+                    st.download_button("⬇️ DXF", open(tmp.name, "rb"),
+                                       "bridge.dxf", "application/dxf")
+
+                # PDF
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    generate_tender_report(uploaded, tmp.name)
+                    st.download_button("⬇️ Tender PDF",
+                                       open(tmp.name, "rb"),
+                                       "tender_report.pdf", "application/pdf")
