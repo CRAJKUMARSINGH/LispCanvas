@@ -1885,27 +1885,16 @@ if __name__ == "__main__":
         ], columns=["Value", "Variable", "Description"])
 
     entries = {}
-    entries = {}
     for idx, (_, row) in enumerate(df.iterrows()):
         var = row["Variable"]
         val = row["Value"]
-        desc = row["Description"]
-        
-        # Create label for Variable
+        val = row["Description"]
         ttk.Label(root, text=var).grid(row=idx, column=0, sticky="e", padx=5, pady=2)
-        
-        # Create entry for Value
-        val_entry = ttk.Entry(root, width=15)
-        val_entry.insert(0, str(val) if pd.notnull(val) else "")
-        val_entry.grid(row=idx, column=1, padx=5, pady=2)
-        
-        # Create label for Description (non-editable)
-        ttk.Label(root, text=desc if pd.notnull(desc) else "").grid(row=idx, column=2, sticky="w", padx=5, pady=2)
-        
-        # Store the Value entry
-        entries[var] = val_entry
+        ent = ttk.Entry(root, width=15)
+        ent.insert(0, str(val))
+        ent.grid(row=idx, column=1, padx=5, pady=2)
+        entries[var] = ent
 
-    # Add the Draw & Save button
-    ttk.Button(root, text="Draw & Save", command=draw_bridge).grid(row=len(df), column=0, columnspan=2, pady=15)
+    ttk.Button(root, text="Draw & Save", command=draw_bridge).grid(row=len(df)+1, column=0, columnspan=2, pady=15)
 
     root.mainloop()
