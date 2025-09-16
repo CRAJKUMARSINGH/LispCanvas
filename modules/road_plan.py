@@ -49,4 +49,102 @@ def page_road_plan():
         
         # Design Standards
         st.subheader("Design Standards")
-        design_standard = st.selectbox("Design Standard", ["IRC:73-1980", "AASHTO", 
+        design_standard = st.selectbox("Design Standard", ["IRC:73-1980", "AASHTO", "BS Standards"])
+        
+    # Main content area
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.header("Road Plan View")
+        
+        # Generate road plan button
+        if st.button("Generate Road Plan"):
+            # Create DXF for road plan
+            doc = ezdxf.new('R2010', setup=True)
+            msp = doc.modelspace()
+            
+            # Draw centerline
+            if alignment_type == "Straight":
+                start_point = (0, 0)
+                end_point = (road_length, 0)
+                msp.add_line(start_point, end_point, dxfattribs={'color': 1})
+                
+            elif alignment_type == "Curved":
+                # Simple curved road approximation
+                points = []
+                num_segments = 20
+                for i in range(num_segments + 1):
+                    t = i / num_segments
+                    if curve_angle <= 90:
+                        x = curve_radius * math.sin(math.radians(curve_angle * t))
+                        y = curve_radius * (1 - math.cos(math.radians(curve_angle * t)))
+                    else:
+                        x = t * road_length
+                        y = 0
+                    points.append((x, y))
+                
+                # Draw curve as polyline
+                msp.add_lwpolyline(points)
+            
+            # Add road edges
+            road_edge_offset = road_width / 2
+            if has_shoulders:
+                road_edge_offset += shoulder_width
+            
+            # Add dimensions and labels
+            msp.add_text(f"Road Length: {road_length}m", dxfattribs={
+                'height': 2.0,
+                'insert': (road_length/2, -10)
+            })
+            
+            # Convert to downloadable file
+            import tempfile
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.dxf') as temp_file:
+                doc.saveas(temp_file.name)
+                with open(temp_file.name, 'rb') as f:
+                    dxf_bytes = f.read()
+            
+            st.success("Road plan generated successfully!")
+            st.download_button(
+                label="Download DXF",
+                data=dxf_bytes,
+                file_name=f"road_plan_{int(road_length)}m.dxf",
+                mime="application/dxf"
+            )
+    
+    with col2:
+        st.header("Road Specifications")
+        
+        # Display calculated parameters
+        st.subheader("Calculated Parameters")
+        st.write(f"**Road Length:** {road_length} m")
+        st.write(f"**Road Width:** {road_width} m")
+        st.write(f"**Design Speed:** {design_speed} km/h")
+        
+        if alignment_type != "Straight":
+            st.write(f"**Curve Radius:** {curve_radius} m")
+            st.write(f"**Deflection Angle:** {curve_angle}°")
+            
+        if has_shoulders:
+            st.write(f"**Shoulder Width:** {shoulder_width} m")
+            st.write(f"**Total Width:** {road_width + 2*shoulder_width} m")
+        
+        st.write(f"**Superelevation:** {superelevation*100:.1f}%")
+        st.write(f"**Design Standard:** {design_standard}")
+        
+        # Show design checks
+        st.subheader("Design Checks")
+        
+        if alignment_type != "Straight":
+            # Minimum radius check
+            min_radius = design_speed**2 / (127 * (0.15 + superelevation))  # IRC formula
+            if curve_radius >= min_radius:
+                st.success(f"✅ Radius OK (Min: {min_radius:.1f}m)")
+            else:
+                st.error(f"❌ Radius too small (Min: {min_radius:.1f}m)")
+        
+        # Speed consistency check
+        if design_speed > 80:
+            st.info("High-speed road - consider expressway standards")
+        elif design_speed < 30:
+            st.warning("Low-speed road - check urban design guidelines")
