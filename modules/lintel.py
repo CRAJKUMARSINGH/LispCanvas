@@ -264,7 +264,13 @@ def generate_lintel_dxf(span, width, depth, opening_width, opening_height,
     msp.add_text("PLAN", 
                 dxfattribs={'height': 80 * scale, 'insert': (plan_offset_x + total_len_scaled/2, width_scaled + 100 * scale)})
     
-    # Save to bytes
-    buffer = BytesIO()
-    doc.write(buffer)
-    return buffer.getvalue()
+    # Save to temporary file and read back
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix='.dxf', delete=False) as fp:
+        temp_filename = fp.name
+    doc.saveas(temp_filename)
+    with open(temp_filename, 'rb') as f:
+        content = f.read()
+    import os
+    os.unlink(temp_filename)
+    return content

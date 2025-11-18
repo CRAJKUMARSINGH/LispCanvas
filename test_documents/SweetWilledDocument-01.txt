@@ -1,0 +1,96 @@
+SWEET WILLED DOCUMENT - 01
+=====================================
+
+STRUCTURAL DESIGN PARAMETERS
+Project: Residential Building - Ground Floor
+Location: Mumbai, Maharashtra
+Engineer: Rajkumar
+Date: 2024-09-25
+
+BEAM DESIGN PARAMETERS:
+- Beam Width: 300 mm
+- Beam Depth: 450 mm
+- Beam Length: 6.0 m
+- Concrete Grade: M25
+- Steel Grade: Fe415
+- Dead Load: 15 kN/m
+- Live Load: 10 kN/m
+- Bottom Bars: 3-16mm dia
+- Top Bars: 2-12mm dia
+- Stirrups: 8mm dia @ 150mm c/c
+- Clear Cover: 25 mm
+
+COLUMN DESIGN PARAMETERS:
+- Column Size: 300x450 mm
+- Column Height: 3.0 m
+- Concrete Grade: M25
+- Steel Grade: Fe415
+- Axial Load: 800 kN
+- Major Moment: 60 kNm
+- Minor Moment: 40 kNm
+- Longitudinal Bars: 8-16mm dia
+- Ties: 8mm dia @ 150mm c/c
+
+SUNSHADE DESIGN PARAMETERS:
+- Web Width: 300 mm
+- Beam Depth: 450 mm
+- Projection: 1200 mm
+- Support Thickness: 150 mm
+- Edge Thickness: 100 mm
+- Main Bars: 10mm dia
+- Distribution Bars: 8mm dia @ 150mm c/c
+
+STAIRCASE DESIGN PARAMETERS:
+- Rise: 150 mm
+- Tread: 300 mm
+- Waist Thickness: 150 mm
+- Span: 3.0 m
+- Live Load: 3 kN/m²
+- Floor Finish: 1 kN/m²
+- Concrete Grade: M25
+- Steel Grade: Fe415
+
+ROAD DESIGN PARAMETERS:
+- Road Width: 7.0 m
+- Carriageway: 3.5 m
+- Shoulder Width: 1.5 m
+- Design Speed: 60 km/h
+- Traffic Volume: 500 PCU/day
+- Subgrade CBR: 8%
+- Pavement Type: Flexible
+
+BRIDGE DESIGN PARAMETERS:
+- Span Length: 20.0 m
+- Bridge Width: 7.5 m
+- Deck Thickness: 200 mm
+- Girder Spacing: 2.5 m
+- Live Load: IRC Class A
+- Concrete Grade: M30
+- Steel Grade: Fe415
+
+FOOTING DESIGN PARAMETERS:
+- Footing Type: Square
+- Footing Size: 2.0x2.0 m
+- Footing Thickness: 400 mm
+- Column Load: 800 kN
+- Soil Bearing Capacity: 200 kN/m²
+- Main Bars: 12mm dia @ 150mm c/c
+- Distribution Bars: 10mm dia @ 200mm c/c
+
+LINTEL DESIGN PARAMETERS:
+- Lintel Width: 300 mm
+- Lintel Depth: 200 mm
+- Lintel Length: 2.4 m
+- Opening Width: 1.2 m
+- Wall Thickness: 230 mm
+- Load from Wall: 15 kN/m
+- Concrete Grade: M20
+- Steel Grade: Fe415
+
+NOTES:
+- All designs comply with IS 456:2000
+- Safety factors as per IS codes
+- Environmental conditions: Normal exposure
+- Seismic zone: Zone III
+- Wind speed: 39 m/s
+- Temperature: 30°C ± 10°C

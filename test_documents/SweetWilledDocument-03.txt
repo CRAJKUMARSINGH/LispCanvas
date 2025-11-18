@@ -1,0 +1,96 @@
+SWEET WILLED DOCUMENT - 03
+=====================================
+
+STRUCTURAL DESIGN PARAMETERS
+Project: Industrial Building - Warehouse
+Location: Chennai, Tamil Nadu
+Engineer: Rajkumar
+Date: 2024-09-25
+
+BEAM DESIGN PARAMETERS:
+- Beam Width: 500 mm
+- Beam Depth: 800 mm
+- Beam Length: 12.0 m
+- Concrete Grade: M35
+- Steel Grade: Fe550
+- Dead Load: 40 kN/m
+- Live Load: 25 kN/m
+- Bottom Bars: 6-25mm dia
+- Top Bars: 4-20mm dia
+- Stirrups: 12mm dia @ 100mm c/c
+- Clear Cover: 40 mm
+
+COLUMN DESIGN PARAMETERS:
+- Column Size: 500x800 mm
+- Column Height: 4.0 m
+- Concrete Grade: M35
+- Steel Grade: Fe550
+- Axial Load: 3000 kN
+- Major Moment: 200 kNm
+- Minor Moment: 150 kNm
+- Longitudinal Bars: 16-25mm dia
+- Ties: 12mm dia @ 100mm c/c
+
+SUNSHADE DESIGN PARAMETERS:
+- Web Width: 500 mm
+- Beam Depth: 800 mm
+- Projection: 2000 mm
+- Support Thickness: 250 mm
+- Edge Thickness: 150 mm
+- Main Bars: 16mm dia
+- Distribution Bars: 12mm dia @ 100mm c/c
+
+STAIRCASE DESIGN PARAMETERS:
+- Rise: 170 mm
+- Tread: 260 mm
+- Waist Thickness: 200 mm
+- Span: 5.0 m
+- Live Load: 5 kN/m²
+- Floor Finish: 2 kN/m²
+- Concrete Grade: M35
+- Steel Grade: Fe550
+
+ROAD DESIGN PARAMETERS:
+- Road Width: 12.0 m
+- Carriageway: 9.0 m
+- Shoulder Width: 1.5 m
+- Design Speed: 100 km/h
+- Traffic Volume: 5000 PCU/day
+- Subgrade CBR: 12%
+- Pavement Type: Composite
+
+BRIDGE DESIGN PARAMETERS:
+- Span Length: 40.0 m
+- Bridge Width: 12.0 m
+- Deck Thickness: 300 mm
+- Girder Spacing: 3.5 m
+- Live Load: IRC Class 70R + Class A
+- Concrete Grade: M40
+- Steel Grade: Fe550
+
+FOOTING DESIGN PARAMETERS:
+- Footing Type: Square
+- Footing Size: 4.0x4.0 m
+- Footing Thickness: 600 mm
+- Column Load: 3000 kN
+- Soil Bearing Capacity: 300 kN/m²
+- Main Bars: 20mm dia @ 100mm c/c
+- Distribution Bars: 16mm dia @ 125mm c/c
+
+LINTEL DESIGN PARAMETERS:
+- Lintel Width: 500 mm
+- Lintel Depth: 300 mm
+- Lintel Length: 4.0 m
+- Opening Width: 2.4 m
+- Wall Thickness: 400 mm
+- Load from Wall: 40 kN/m
+- Concrete Grade: M30
+- Steel Grade: Fe550
+
+NOTES:
+- All designs comply with IS 456:2000
+- Safety factors as per IS codes
+- Environmental conditions: Very severe exposure
+- Seismic zone: Zone V
+- Wind speed: 55 m/s
+- Temperature: 40°C ± 20°C

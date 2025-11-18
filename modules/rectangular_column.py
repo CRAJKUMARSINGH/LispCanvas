@@ -94,15 +94,20 @@ def page_rectangular_column():
             (cover - tie_dia/2, cover - tie_dia/2)
         ])
         
-        # Save DXF to bytes
-        dxf_bytes = BytesIO()
-        doc.saveas(dxf_bytes)
-        dxf_bytes.seek(0)
+        # Save DXF to bytes - Fixed the issue here using the correct approach
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(suffix='.dxf', delete=False) as fp:
+            temp_filename = fp.name
+        doc.saveas(temp_filename)
+        with open(temp_filename, 'rb') as f:
+            dxf_content = f.read()
+        os.unlink(temp_filename)
         
         # Download button
         st.download_button(
             label="Download DXF",
-            data=dxf_bytes,
+            data=dxf_content,
             file_name="rectangular_column.dxf",
             mime="application/dxf"
         )

@@ -1,0 +1,96 @@
+SWEET WILLED DOCUMENT - 10
+=====================================
+
+STRUCTURAL DESIGN PARAMETERS
+Project: Shopping Mall - Multi Story
+Location: Hyderabad, Telangana
+Engineer: Rajkumar
+Date: 2024-09-25
+
+BEAM DESIGN PARAMETERS:
+- Beam Width: 500 mm
+- Beam Depth: 800 mm
+- Beam Length: 10.0 m
+- Concrete Grade: M40
+- Steel Grade: Fe500
+- Dead Load: 35 kN/m
+- Live Load: 20 kN/m
+- Bottom Bars: 8-25mm dia
+- Top Bars: 5-20mm dia
+- Stirrups: 12mm dia @ 100mm c/c
+- Clear Cover: 40 mm
+
+COLUMN DESIGN PARAMETERS:
+- Column Size: 500x800 mm
+- Column Height: 4.0 m
+- Concrete Grade: M40
+- Steel Grade: Fe500
+- Axial Load: 3000 kN
+- Major Moment: 180 kNm
+- Minor Moment: 120 kNm
+- Longitudinal Bars: 20-25mm dia
+- Ties: 12mm dia @ 100mm c/c
+
+SUNSHADE DESIGN PARAMETERS:
+- Web Width: 500 mm
+- Beam Depth: 800 mm
+- Projection: 2000 mm
+- Support Thickness: 250 mm
+- Edge Thickness: 150 mm
+- Main Bars: 25mm dia
+- Distribution Bars: 12mm dia @ 100mm c/c
+
+STAIRCASE DESIGN PARAMETERS:
+- Rise: 170 mm
+- Tread: 320 mm
+- Waist Thickness: 220 mm
+- Span: 5.0 m
+- Live Load: 5.0 kN/m²
+- Floor Finish: 2.5 kN/m²
+- Concrete Grade: M40
+- Steel Grade: Fe500
+
+ROAD DESIGN PARAMETERS:
+- Road Width: 15.0 m
+- Carriageway: 10.0 m
+- Shoulder Width: 2.5 m
+- Design Speed: 80 km/h
+- Traffic Volume: 2000 PCU/day
+- Subgrade CBR: 12%
+- Pavement Type: Flexible
+
+BRIDGE DESIGN PARAMETERS:
+- Span Length: 40.0 m
+- Bridge Width: 15.0 m
+- Deck Thickness: 300 mm
+- Girder Spacing: 4.0 m
+- Live Load: IRC Class A
+- Concrete Grade: M45
+- Steel Grade: Fe500
+
+FOOTING DESIGN PARAMETERS:
+- Footing Type: Square
+- Footing Size: 4.0x4.0 m
+- Footing Thickness: 700 mm
+- Column Load: 3000 kN
+- Soil Bearing Capacity: 300 kN/m²
+- Main Bars: 25mm dia @ 100mm c/c
+- Distribution Bars: 20mm dia @ 125mm c/c
+
+LINTEL DESIGN PARAMETERS:
+- Lintel Width: 500 mm
+- Lintel Depth: 350 mm
+- Lintel Length: 4.0 m
+- Opening Width: 2.5 m
+- Wall Thickness: 400 mm
+- Load from Wall: 35 kN/m
+- Concrete Grade: M35
+- Steel Grade: Fe500
+
+NOTES:
+- All designs comply with IS 456:2000
+- Safety factors as per IS codes
+- Environmental conditions: Severe exposure
+- Seismic zone: Zone II
+- Wind speed: 39 m/s
+- Temperature: 35°C ± 15°C

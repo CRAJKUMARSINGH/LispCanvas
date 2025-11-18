@@ -105,8 +105,13 @@ def create_bridge_reference_images():
         
         return elevation_img, plan_img
         
-    except ImportError:
-        # If matplotlib is not available, return None
+    except ImportError as e:
+        # If matplotlib or numpy is not available or has import issues, return None
+        print(f"Warning: Could not create reference images due to import error: {e}")
+        return None, None
+    except Exception as e:
+        # Handle any other errors during image creation
+        print(f"Warning: Could not create reference images due to error: {e}")
         return None, None
 
 def get_default_bridge_variables():

@@ -152,7 +152,13 @@ def generate_circular_column_footing_dxf(col_dia, col_height, foot_dia, foot_thi
     msp.add_text(f"FOOTING Ø{foot_dia} x {foot_thickness}mm", 
                 dxfattribs={'height': 50 * scale, 'insert': (0, foot_radius + 200 * scale)})
     
-    # Save to bytes
-    buffer = BytesIO()
-    doc.write(buffer)
-    return buffer.getvalue()
+    # Save to bytes - Fixed the issue here using the correct approach
+    import tempfile
+    import os
+    with tempfile.NamedTemporaryFile(suffix='.dxf', delete=False) as fp:
+        temp_filename = fp.name
+    doc.saveas(temp_filename)
+    with open(temp_filename, 'rb') as f:
+        content = f.read()
+    os.unlink(temp_filename)
+    return content
