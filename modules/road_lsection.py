@@ -2,7 +2,11 @@ import streamlit as st
 import numpy as np
 import ezdxf
 from io import BytesIO
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+    HAS_MATPLOTLIB = True
+except:
+    HAS_MATPLOTLIB = False
 
 def page_road_lsection():
     st.title("Road Longitudinal Section Designer")

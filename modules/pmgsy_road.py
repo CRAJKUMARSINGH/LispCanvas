@@ -3,7 +3,11 @@ import ezdxf
 import math
 from io import BytesIO
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+    HAS_MATPLOTLIB = True
+except:
+    HAS_MATPLOTLIB = False
 
 def page_pmgsy_road():
     st.title("PMGSY Road Design")

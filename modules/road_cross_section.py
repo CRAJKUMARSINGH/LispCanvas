@@ -1,8 +1,12 @@
 import streamlit as st
 import ezdxf
 import numpy as np
-import matplotlib.pyplot as plt
 from io import BytesIO
+try:
+    import matplotlib.pyplot as plt
+    HAS_MATPLOTLIB = True
+except:
+    HAS_MATPLOTLIB = False
 
 def page_road_cross_section():
     st.title("Road Cross Section Designer")
